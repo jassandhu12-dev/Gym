@@ -1,131 +1,219 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#111827">
+<meta name="theme-color" content="#10151f">
 <title>Workouts</title>
 <style>
 :root{--bg:#10151f;--panel:#1b2432;--muted:#9aa8ba;--accent:#b8f34a;--text:#f5f7fa}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
-header{padding:26px 20px 18px;background:linear-gradient(135deg,#202d3c,#111722)}
+header{padding:25px 20px;background:linear-gradient(135deg,#202d3c,#111722)}
 header small{color:var(--accent);font-weight:bold;letter-spacing:2px}
 h1{font-size:32px;margin:8px 0 4px}
 header p{color:var(--muted);margin:0}
-main{max-width:650px;margin:auto;padding:18px 15px 40px}
-.days{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
-.days button{background:var(--panel);color:var(--text);border:1px solid #344153;border-radius:12px;padding:13px 5px;font-weight:bold;font-size:13px}
-.days button.active{background:var(--accent);color:#17200d;border-color:var(--accent)}
-.card{background:var(--panel);border:1px solid #2c394a;border-radius:16px;padding:17px;margin-bottom:12px}
+main{max-width:650px;margin:auto;padding:16px 14px 40px}
+.days{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:15px}
+.days button{background:var(--panel);color:var(--text);border:1px solid #344153;border-radius:12px;padding:13px 4px;font-weight:bold}
+.days button.active{background:var(--accent);color:#17200d}
+.card{background:var(--panel);border:1px solid #2c394a;border-radius:16px;padding:16px;margin-bottom:13px}
 h2{margin:0 0 6px;font-size:23px}
-.sub{color:var(--muted);font-size:13px;margin:0 0 16px}
-.exercise{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-top:1px solid #344153}
-.exercise input{width:21px;height:21px;accent-color:var(--accent);flex-shrink:0;margin-top:2px}
-.exercise strong{display:block;font-size:15px}
-.exercise span{display:block;color:var(--muted);font-size:13px;margin-top:5px;line-height:1.4}
-.exercise.done strong{text-decoration:line-through;color:#9aa8ba}
+.sub,.note{color:var(--muted);font-size:13px;line-height:1.5}
 .progress{height:7px;background:#344153;border-radius:10px;overflow:hidden;margin:12px 0}
-.progress div{height:100%;width:0;background:var(--accent);transition:width .2s}
-.action{width:100%;padding:14px;border:0;border-radius:12px;background:var(--accent);color:#17200d;font-weight:bold;font-size:15px;margin-top:8px}
+.progress div{height:100%;background:var(--accent);width:0}
+.exercise{padding:14px 0;border-top:1px solid #344153}
+.exercise-top{display:flex;gap:10px;align-items:flex-start}
+.exercise-top input[type=checkbox]{width:21px;height:21px;accent-color:var(--accent);flex-shrink:0}
+.exercise-top strong{font-size:15px}
+.exercise-top span{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+.exercise.done strong{text-decoration:line-through;color:var(--muted)}
+.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:13px 0 8px}
+.field label{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}
+.field input{width:100%;min-width:0;background:#101722;color:white;border:1px solid #455468;border-radius:8px;padding:10px;font-size:15px}
+.timer-btn,.action{border:0;border-radius:10px;padding:12px;font-weight:bold}
+.timer-btn{background:#34465a;color:white;width:100%}
+.action{width:100%;background:var(--accent);color:#17200d;font-size:15px;margin-top:8px}
 .secondary{background:#303d4e;color:white}
-.note{color:var(--muted);font-size:13px;line-height:1.5}
+.timer{text-align:center;background:#111a26;border:1px solid #425267;border-radius:14px;padding:17px;margin:14px 0}
+.timer-label{font-size:12px;color:var(--muted)}
+#clock{font-size:42px;font-weight:bold;margin:7px}
+.timer-actions{display:flex;gap:8px}
+.timer-actions button{flex:1}
 footer{text-align:center;color:#738197;font-size:12px;padding:15px}
 </style>
 </head>
 <body>
 <header>
-  <small>YOUR TRAINING SPACE</small>
-  <h1>Workouts 💪</h1>
-  <p>Show up. Put the work in. Get stronger.</p>
+<small>YOUR TRAINING SPACE</small>
+<h1>Workouts 💪</h1>
+<p>Show up. Put the work in. Get stronger.</p>
 </header>
 <main>
-  <div class="days" id="days"></div>
-  <section class="card">
-    <h2 id="heading">Push Day</h2>
-    <p class="sub" id="description"></p>
-    <div class="progress"><div id="bar"></div></div>
-    <p class="note" id="count"></p>
-    <div id="exercises"></div>
-    <button class="action" onclick="finishWorkout()">Finish workout</button>
-    <button class="action secondary" onclick="resetWorkout()">Reset ticks</button>
-  </section>
-  <section class="card">
-    <strong>Today's reminder</strong>
-    <p class="note">Aim for controlled reps and good technique. Rest between sets, drink water and increase the weight gradually when the exercise feels comfortable.</p>
-  </section>
+<div class="days" id="days"></div>
+
+<section class="card">
+<h2 id="heading">Push Day</h2>
+<p class="sub" id="description"></p>
+<div class="progress"><div id="bar"></div></div>
+<p class="note" id="count"></p>
+
+<div class="timer">
+<div class="timer-label" id="timerLabel">REST TIMER</div>
+<div id="clock">01:30</div>
+<div class="timer-actions">
+<button class="timer-btn" onclick="pauseTimer()" id="pauseBtn">Pause</button>
+<button class="timer-btn" onclick="resetTimer()">Reset</button>
+</div>
+</div>
+
+<div id="exercises"></div>
+<button class="action" onclick="finishWorkout()">Finish workout</button>
+<button class="action secondary" onclick="resetWorkout()">Reset exercise ticks</button>
+</section>
+
+<section class="card">
+<strong>Your training notes</strong>
+<p class="note">Enter the weight you use for each exercise. Try to improve gradually while keeping good technique. Your settings and weights are saved on this phone.</p>
+</section>
 </main>
 <footer>WORKOUTS · YOUR PERSONAL TRAINING APP</footer>
+
 <script>
 const plans=[
- {name:"Push",title:"Push Day",desc:"Chest, shoulders and triceps",items:[
- ["Incline dumbbell press","3 sets × 8–12 reps"],
- ["Shoulder press","3 sets × 8–12 reps"],
- ["Cable chest press","3 sets × 10–12 reps"],
- ["Dumbbell lateral raises","3 sets × 12–15 reps"],
- ["Cable triceps pushdown","3 sets × 10–12 reps"],
- ["Overhead triceps extension","3 sets × 10–12 reps"]
- ]},
- {name:"Pull",title:"Pull Day",desc:"Back and biceps",items:[
- ["Seated cable row","3 sets × 8–12 reps"],
- ["Single-arm dumbbell row","3 sets × 10 each side"],
- ["Lat pulldown","3 sets × 8–12 reps"],
- ["Face pulls","3 sets × 12–15 reps"],
- ["Dumbbell bicep curls","3 sets × 10–12 reps"],
- ["Hammer curls","3 sets × 10–12 reps"]
- ]},
- {name:"Kettlebell",title:"Kettlebell Day",desc:"Strength, conditioning and full-body movement",items:[
- ["Kettlebell swings","3 sets × 15 reps"],
- ["Goblet squats","3 sets × 10 reps"],
- ["Kettlebell deadlifts","3 sets × 12 reps"],
- ["Single-arm kettlebell rows","3 sets × 10 each side"],
- ["Kettlebell clean and press","3 sets × 8 each side"],
- ["Farmer carry","3 rounds × 30 seconds"]
- ]},
- {name:"Core",title:"Core & Abs",desc:"Build a stronger middle and improve stability",items:[
- ["Plank","3 sets × 30–45 seconds"],
- ["Dead bugs","3 sets × 10 each side"],
- ["Cable crunches","3 sets × 12 reps"],
- ["Reverse crunches","3 sets × 12 reps"],
- ["Bird dogs","3 sets × 10 each side"],
- ["Side plank","2 sets × 20–30 seconds each side"]
- ]},
- {name:"Walk",title:"30-Minute Radio Walk",desc:"A simple walking session to keep you moving",items:[
- ["Warm-up walk","5 minutes – easy pace"],
- ["Brisk radio walk","20 minutes – purposeful pace"],
- ["Cool-down walk","5 minutes – slow down gradually"]
- ]}
+{name:"Push",title:"Push Day",desc:"Chest, shoulders and triceps",items:[
+["Incline dumbbell press","8–12 reps",3,90],
+["Shoulder press","8–12 reps",3,90],
+["Cable chest press","10–12 reps",3,90],
+["Dumbbell lateral raises","12–15 reps",3,60],
+["Cable triceps pushdown","10–12 reps",3,60],
+["Overhead triceps extension","10–12 reps",3,60]]},
+{name:"Pull",title:"Pull Day",desc:"Back and biceps",items:[
+["Seated cable row","8–12 reps",3,90],
+["Single-arm dumbbell row","10 each side",3,90],
+["Lat pulldown","8–12 reps",3,90],
+["Face pulls","12–15 reps",3,60],
+["Dumbbell bicep curls","10–12 reps",3,60],
+["Hammer curls","10–12 reps",3,60]]},
+{name:"Kettlebell",title:"Kettlebell Day",desc:"Full-body strength and conditioning",items:[
+["Kettlebell swings","15 reps",3,60],
+["Goblet squats","10 reps",3,90],
+["Kettlebell deadlifts","12 reps",3,90],
+["Single-arm kettlebell rows","10 each side",3,60],
+["Kettlebell clean and press","8 each side",3,90],
+["Farmer carry","30 seconds",3,60]]},
+{name:"Core",title:"Core & Abs",desc:"Build a stronger middle",items:[
+["Plank","30–45 seconds",3,45],
+["Dead bugs","10 each side",3,45],
+["Cable crunches","12 reps",3,60],
+["Reverse crunches","12 reps",3,45],
+["Bird dogs","10 each side",3,45],
+["Side plank","20–30 seconds each side",2,45]]},
+{name:"Walk",title:"30-Minute Radio Walk",desc:"Get moving and enjoy your walk",items:[
+["Warm-up walk","5 minutes – easy pace",1,0],
+["Brisk radio walk","20 minutes – purposeful pace",1,0],
+["Cool-down walk","5 minutes – easy pace",1,0]]}
 ];
+
 let selected=0;
 let checks=JSON.parse(localStorage.getItem("workoutsChecks")||"{}");
-function key(){return plans[selected].name}
-function save(){localStorage.setItem("workoutsChecks",JSON.stringify(checks))}
+let settings=JSON.parse(localStorage.getItem("workoutsSettings")||"{}");
+let remaining=90, interval=null, running=false;
+
+function saveChecks(){localStorage.setItem("workoutsChecks",JSON.stringify(checks))}
+function saveSettings(){localStorage.setItem("workoutsSettings",JSON.stringify(settings))}
+function settingKey(i){return plans[selected].name+"-"+i}
+function getSetting(i){
+let p=plans[selected].items[i],s=settings[settingKey(i)]||{};
+return {sets:s.sets??p[2],weight:s.weight??"",rest:s.rest??p[3]};
+}
+function updateSetting(i,field,value){
+let k=settingKey(i);
+settings[k]=settings[k]||getSetting(i);
+settings[k][field]=value;
+saveSettings();
+}
 function render(){
- document.getElementById("days").innerHTML=plans.map((p,i)=>`<button class="${i===selected?'active':''}" onclick="selectDay(${i})">${p.name}</button>`).join("");
- const p=plans[selected],done=checks[key()]||[];
- document.getElementById("heading").textContent=p.title;
- document.getElementById("description").textContent=p.desc;
- document.getElementById("exercises").innerHTML=p.items.map((it,i)=>`
- <label class="exercise ${done.includes(i)?'done':''}">
- <input type="checkbox" ${done.includes(i)?'checked':''} onchange="toggle(${i},this.checked)">
- <div><strong>${it[0]}</strong><span>${it[1]}</span></div>
- </label>`).join("");
- let n=done.length,total=p.items.length;
- document.getElementById("count").textContent=`${n} of ${total} completed`;
- document.getElementById("bar").style.width=(n/total*100)+"%";
+document.getElementById("days").innerHTML=plans.map((p,i)=>
+`<button class="${i===selected?'active':''}" onclick="selectDay(${i})">${p.name}</button>`).join("");
+let p=plans[selected],done=checks[p.name]||[];
+document.getElementById("heading").textContent=p.title;
+document.getElementById("description").textContent=p.desc;
+document.getElementById("exercises").innerHTML=p.items.map((it,i)=>{
+let s=getSetting(i);
+return `<div class="exercise ${done.includes(i)?'done':''}">
+<div class="exercise-top">
+<input type="checkbox" ${done.includes(i)?'checked':''} onchange="toggle(${i},this.checked)">
+<div><strong>${it[0]}</strong><span>${it[1]}</span></div>
+</div>
+<div class="controls">
+<div class="field"><label>SETS</label><input type="number" min="1" max="20" value="${s.sets}" onchange="updateSetting(${i},'sets',this.value)"></div>
+${p.name!=="Walk"?`<div class="field"><label>WEIGHT (KG)</label><input type="number" min="0" step="0.5" placeholder="e.g. 12" value="${s.weight}" onchange="updateSetting(${i},'weight',this.value)"></div>`:''}
+<div class="field"><label>REST (SEC)</label><input type="number" min="0" max="600" value="${s.rest}" onchange="updateSetting(${i},'rest',this.value)"></div>
+</div>
+${p.name!=="Walk"?`<button class="timer-btn" onclick="startTimer(${i})">Start ${s.rest}-second rest timer</button>`:''}
+</div>`;
+}).join("");
+let n=done.length,total=p.items.length;
+document.getElementById("count").textContent=`${n} of ${total} exercises completed`;
+document.getElementById("bar").style.width=(n/total*100)+"%";
 }
 function selectDay(i){selected=i;render()}
 function toggle(i,on){
- let a=checks[key()]||[];
- checks[key()]=on?[...new Set([...a,i])]:a.filter(x=>x!==i);
- save();render();
+let a=checks[plans[selected].name]||[];
+checks[plans[selected].name]=on?[...new Set([...a,i])]:a.filter(x=>x!==i);
+saveChecks();render();
 }
-function resetWorkout(){checks[key()]=[];save();render()}
+function resetWorkout(){checks[plans[selected].name]=[];saveChecks();render()}
 function finishWorkout(){
- const n=(checks[key()]||[]).length;
- alert(n===plans[selected].items.length?"Brilliant work! Workout completed. 💪":`You've completed ${n} of ${plans[selected].items.length}. Keep going!`);
+let n=(checks[plans[selected].name]||[]).length;
+alert(n===plans[selected].items.length?"Brilliant work! Workout completed! 💪":`You've completed ${n} of ${plans[selected].items.length} exercises.`);
 }
-render();
+function showTimer(){
+let m=Math.floor(remaining/60),s=remaining%60;
+document.getElementById("clock").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+document.getElementById("pauseBtn").textContent=running?"Pause":"Resume";
+}
+function startTimer(i){
+let s=getSetting(i);
+clearInterval(interval);
+remaining=Math.max(0,Number(s.rest)||0);
+document.getElementById("timerLabel").textContent="REST TIMER · "+plans[selected].items[i][0];
+running=true;showTimer();
+if(remaining===0){running=false;return}
+interval=setInterval(()=>{
+remaining--;
+showTimer();
+if(remaining<=0){
+clearInterval(interval);interval=null;running=false;
+document.getElementById("timerLabel").textContent="REST COMPLETE · GO AGAIN!";
+showTimer();
+if(navigator.vibrate)navigator.vibrate([250,150,250]);
+}
+},1000);
+}
+function pauseTimer(){
+if(running){clearInterval(interval);interval=null;running=false}
+else if(remaining>0){
+running=true;
+interval=setInterval(()=>{
+remaining--;showTimer();
+if(remaining<=0){
+clearInterval(interval);interval=null;running=false;
+document.getElementById("timerLabel").textContent="REST COMPLETE · GO AGAIN!";
+if(navigator.vibrate)navigator.vibrate([250,150,250]);
+}
+},1000);
+}
+showTimer();
+}
+function resetTimer(){
+clearInterval(interval);interval=null;running=false;remaining=90;
+document.getElementById("timerLabel").textContent="REST TIMER";
+showTimer();
+}
+render();showTimer();
 </script>
 </body>
 </html>
