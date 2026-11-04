@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111827">
+<title>Workouts</title>
+<style>
+:root{--bg:#10151f;--panel:#1b2432;--muted:#9aa8ba;--accent:#b8f34a;--text:#f5f7fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+header{padding:26px 20px 18px;background:linear-gradient(135deg,#202d3c,#111722)}
+header small{color:var(--accent);font-weight:bold;letter-spacing:2px}
+h1{font-size:32px;margin:8px 0 4px}
+header p{color:var(--muted);margin:0}
+main{max-width:650px;margin:auto;padding:18px 15px 40px}
+.days{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.days button{background:var(--panel);color:var(--text);border:1px solid #344153;border-radius:12px;padding:13px 5px;font-weight:bold;font-size:13px}
+.days button.active{background:var(--accent);color:#17200d;border-color:var(--accent)}
+.card{background:var(--panel);border:1px solid #2c394a;border-radius:16px;padding:17px;margin-bottom:12px}
+h2{margin:0 0 6px;font-size:23px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+.exercise{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-top:1px solid #344153}
+.exercise input{width:21px;height:21px;accent-color:var(--accent);flex-shrink:0;margin-top:2px}
+.exercise strong{display:block;font-size:15px}
+.exercise span{display:block;color:var(--muted);font-size:13px;margin-top:5px;line-height:1.4}
+.exercise.done strong{text-decoration:line-through;color:#9aa8ba}
+.progress{height:7px;background:#344153;border-radius:10px;overflow:hidden;margin:12px 0}
+.progress div{height:100%;width:0;background:var(--accent);transition:width .2s}
+.action{width:100%;padding:14px;border:0;border-radius:12px;background:var(--accent);color:#17200d;font-weight:bold;font-size:15px;margin-top:8px}
+.secondary{background:#303d4e;color:white}
+.note{color:var(--muted);font-size:13px;line-height:1.5}
+footer{text-align:center;color:#738197;font-size:12px;padding:15px}
+</style>
+</head>
+<body>
+<header>
+  <small>YOUR TRAINING SPACE</small>
+  <h1>Workouts 💪</h1>
+  <p>Show up. Put the work in. Get stronger.</p>
+</header>
+<main>
+  <div class="days" id="days"></div>
+  <section class="card">
+    <h2 id="heading">Push Day</h2>
+    <p class="sub" id="description"></p>
+    <div class="progress"><div id="bar"></div></div>
+    <p class="note" id="count"></p>
+    <div id="exercises"></div>
+    <button class="action" onclick="finishWorkout()">Finish workout</button>
+    <button class="action secondary" onclick="resetWorkout()">Reset ticks</button>
+  </section>
+  <section class="card">
+    <strong>Today's reminder</strong>
+    <p class="note">Aim for controlled reps and good technique. Rest between sets, drink water and increase the weight gradually when the exercise feels comfortable.</p>
+  </section>
+</main>
+<footer>WORKOUTS · YOUR PERSONAL TRAINING APP</footer>
+<script>
+const plans=[
+ {name:"Push",title:"Push Day",desc:"Chest, shoulders and triceps",items:[
+ ["Incline dumbbell press","3 sets × 8–12 reps"],
+ ["Shoulder press","3 sets × 8–12 reps"],
+ ["Cable chest press","3 sets × 10–12 reps"],
+ ["Dumbbell lateral raises","3 sets × 12–15 reps"],
+ ["Cable triceps pushdown","3 sets × 10–12 reps"],
+ ["Overhead triceps extension","3 sets × 10–12 reps"]
+ ]},
+ {name:"Pull",title:"Pull Day",desc:"Back and biceps",items:[
+ ["Seated cable row","3 sets × 8–12 reps"],
+ ["Single-arm dumbbell row","3 sets × 10 each side"],
+ ["Lat pulldown","3 sets × 8–12 reps"],
+ ["Face pulls","3 sets × 12–15 reps"],
+ ["Dumbbell bicep curls","3 sets × 10–12 reps"],
+ ["Hammer curls","3 sets × 10–12 reps"]
+ ]},
+ {name:"Kettlebell",title:"Kettlebell Day",desc:"Strength, conditioning and full-body movement",items:[
+ ["Kettlebell swings","3 sets × 15 reps"],
+ ["Goblet squats","3 sets × 10 reps"],
+ ["Kettlebell deadlifts","3 sets × 12 reps"],
+ ["Single-arm kettlebell rows","3 sets × 10 each side"],
+ ["Kettlebell clean and press","3 sets × 8 each side"],
+ ["Farmer carry","3 rounds × 30 seconds"]
+ ]},
+ {name:"Core",title:"Core & Abs",desc:"Build a stronger middle and improve stability",items:[
+ ["Plank","3 sets × 30–45 seconds"],
+ ["Dead bugs","3 sets × 10 each side"],
+ ["Cable crunches","3 sets × 12 reps"],
+ ["Reverse crunches","3 sets × 12 reps"],
+ ["Bird dogs","3 sets × 10 each side"],
+ ["Side plank","2 sets × 20–30 seconds each side"]
+ ]},
+ {name:"Walk",title:"30-Minute Radio Walk",desc:"A simple walking session to keep you moving",items:[
+ ["Warm-up walk","5 minutes – easy pace"],
+ ["Brisk radio walk","20 minutes – purposeful pace"],
+ ["Cool-down walk","5 minutes – slow down gradually"]
+ ]}
+];
+let selected=0;
+let checks=JSON.parse(localStorage.getItem("workoutsChecks")||"{}");
+function key(){return plans[selected].name}
+function save(){localStorage.setItem("workoutsChecks",JSON.stringify(checks))}
+function render(){
+ document.getElementById("days").innerHTML=plans.map((p,i)=>`<button class="${i===selected?'active':''}" onclick="selectDay(${i})">${p.name}</button>`).join("");
+ const p=plans[selected],done=checks[key()]||[];
+ document.getElementById("heading").textContent=p.title;
+ document.getElementById("description").textContent=p.desc;
+ document.getElementById("exercises").innerHTML=p.items.map((it,i)=>`
+ <label class="exercise ${done.includes(i)?'done':''}">
+ <input type="checkbox" ${done.includes(i)?'checked':''} onchange="toggle(${i},this.checked)">
+ <div><strong>${it[0]}</strong><span>${it[1]}</span></div>
+ </label>`).join("");
+ let n=done.length,total=p.items.length;
+ document.getElementById("count").textContent=`${n} of ${total} completed`;
+ document.getElementById("bar").style.width=(n/total*100)+"%";
+}
+function selectDay(i){selected=i;render()}
+function toggle(i,on){
+ let a=checks[key()]||[];
+ checks[key()]=on?[...new Set([...a,i])]:a.filter(x=>x!==i);
+ save();render();
+}
+function resetWorkout(){checks[key()]=[];save();render()}
+function finishWorkout(){
+ const n=(checks[key()]||[]).length;
+ alert(n===plans[selected].items.length?"Brilliant work! Workout completed. 💪":`You've completed ${n} of ${plans[selected].items.length}. Keep going!`);
+}
+render();
+</script>
+</body>
+</html>
