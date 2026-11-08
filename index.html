@@ -28,21 +28,28 @@ header small{color:var(--accent);font-weight:bold;letter-spacing:2px}
 h1{font-size:32px;margin:8px 0 4px}
 header p{color:var(--muted);margin:0}
 main{max-width:650px;margin:auto;padding:16px 14px 40px}
-.days{
-display:grid;grid-template-columns:repeat(3,1fr);
+.navigation{
+display:grid;grid-template-columns:1fr 1fr;
 gap:8px;margin-bottom:15px
 }
-.days button{
+.navigation button,.days button{
 background:var(--panel);color:var(--text);
 border:1px solid #344153;border-radius:12px;
 padding:13px 4px;font-weight:bold
 }
-.days button.active{background:var(--accent);color:#17200d}
+.navigation button.active,.days button.active{
+background:var(--accent);color:#17200d
+}
+.days{
+display:grid;grid-template-columns:repeat(3,1fr);
+gap:8px;margin-bottom:15px
+}
 .card{
 background:var(--panel);border:1px solid #2c394a;
 border-radius:16px;padding:16px;margin-bottom:13px
 }
 h2{margin:0 0 6px;font-size:23px}
+h3{margin:0 0 10px}
 .sub,.note{color:var(--muted);font-size:13px;line-height:1.5}
 .progress{height:7px;background:#344153;border-radius:10px;overflow:hidden;margin:12px 0}
 .progress div{height:100%;background:var(--accent);width:0}
@@ -57,25 +64,19 @@ display:block;color:var(--muted);font-size:13px;margin-top:4px
 }
 .exercise.done strong{text-decoration:line-through;color:var(--muted)}
 .video-btn{
-display:inline-block;
-margin:10px 0 5px;
-background:#34465a;color:white;
-border-radius:8px;padding:9px 13px;
-font-size:13px;font-weight:bold;text-decoration:none
+display:inline-block;margin:10px 0 5px;
+background:#34465a;color:white;border-radius:8px;
+padding:9px 13px;font-size:13px;font-weight:bold;text-decoration:none
 }
 .set-heading{
 display:flex;justify-content:space-between;
 align-items:center;margin:12px 0 8px
 }
-.set-heading strong{font-size:14px}
 .set-row{
 background:#111a26;border:1px solid #344153;
 border-radius:10px;padding:10px;margin-bottom:8px
 }
-.set-title{
-font-size:12px;color:var(--accent);
-font-weight:bold;margin-bottom:8px
-}
+.set-title{font-size:12px;color:var(--accent);font-weight:bold;margin-bottom:8px}
 .controls{
 display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
 gap:8px
@@ -84,11 +85,12 @@ gap:8px
 display:block;color:var(--muted);
 font-size:11px;margin-bottom:5px
 }
-.field input{
+.field input,.field select,.field textarea{
 width:100%;min-width:0;background:#101722;
 color:white;border:1px solid #455468;
 border-radius:8px;padding:10px;font-size:15px
 }
+.field select option{background:#101722}
 .set-actions{display:flex;gap:8px;margin-top:9px}
 .small-btn{
 flex:1;border:0;border-radius:8px;
@@ -114,7 +116,39 @@ padding:17px;margin:14px 0
 #clock{font-size:42px;font-weight:bold;margin:7px}
 .timer-actions{display:flex;gap:8px}
 .timer-actions button{flex:1}
+.hidden{display:none!important}
+.meal{
+border-top:1px solid #344153;padding:15px 0
+}
+.meal h3{display:flex;justify-content:space-between;align-items:center}
+.food-entry{
+background:#111a26;border:1px solid #344153;
+border-radius:10px;padding:12px;margin:8px 0
+}
+.food-entry strong{display:block}
+.food-entry small{color:var(--muted)}
+.food-entry button{
+background:#34465a;color:white;border:0;
+border-radius:7px;padding:6px 10px;float:right
+}
+.food-grid{
+display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+gap:8px;margin-top:10px
+}
+.food-grid .field input{font-size:14px}
+.food-stats{
+display:grid;grid-template-columns:repeat(2,1fr);
+gap:8px;margin:12px 0
+}
+.stat{
+background:#111a26;border:1px solid #344153;
+border-radius:12px;padding:12px
+}
+.stat strong{display:block;font-size:23px;color:var(--accent)}
+.stat span{font-size:12px;color:var(--muted)}
+.meal-total{font-size:12px;color:var(--muted)}
 footer{text-align:center;color:#738197;font-size:12px;padding:15px}
+button{cursor:pointer}
 </style>
 </head>
 
@@ -127,6 +161,16 @@ footer{text-align:center;color:#738197;font-size:12px;padding:15px}
 </header>
 
 <main>
+
+<div class="navigation">
+<button id="workoutTab" class="active" onclick="showPage('workouts')">💪 Workouts</button>
+<button id="foodTab" onclick="showPage('food')">🍽️ Food Tracker</button>
+</div>
+
+<!-- WORKOUTS -->
+
+<section id="workoutPage">
+
 <div class="days" id="days"></div>
 
 <section class="card">
@@ -153,17 +197,127 @@ footer{text-align:center;color:#738197;font-size:12px;padding:15px}
 
 <section class="card">
 <strong>Your training notes</strong>
-<p class="note">
-Enter your weight and reps separately for every set.
-Use Add Set or Remove Set to change your workout.
-Your settings and weights are saved on this phone.
-</p>
+<p class="note">Enter your weight and reps separately for every set. Your settings and weights are saved on this phone.</p>
 </section>
+
+</section>
+
+<!-- FOOD TRACKER -->
+
+<section id="foodPage" class="hidden">
+
+<section class="card">
+<h2>Today's Nutrition 🍽️</h2>
+<p class="sub">Track your meals and hit your protein target.</p>
+
+<div class="field" style="margin-top:12px">
+<label>DATE</label>
+<input type="date" id="foodDate" onchange="renderFood()">
+</div>
+
+<div class="field" style="margin-top:12px">
+<label>DAILY PROTEIN TARGET (GRAMS)</label>
+<input type="number" id="proteinTarget" min="1" value="180" onchange="saveTarget()">
+</div>
+
+<div class="food-stats">
+<div class="stat">
+<strong id="totalProtein">0g</strong>
+<span>PROTEIN</span>
+</div>
+<div class="stat">
+<strong id="totalCalories">0</strong>
+<span>CALORIES</span>
+</div>
+<div class="stat">
+<strong id="totalCarbs">0g</strong>
+<span>CARBS</span>
+</div>
+<div class="stat">
+<strong id="totalFat">0g</strong>
+<span>FAT</span>
+</div>
+</div>
+
+<div class="progress"><div id="proteinBar"></div></div>
+<p class="note" id="proteinMessage">Start adding your meals.</p>
+</section>
+
+<section class="card">
+<h2>Scan a Barcode 📷</h2>
+<p class="sub">Scan packaged food to look it up automatically.</p>
+
+<div id="scanner" class="hidden" style="margin-top:12px">
+<div id="scannerReader" style="width:100%"></div>
+<button class="action secondary" onclick="stopScanner()">Stop Scanner</button>
+</div>
+
+<button class="action" id="scanButton" onclick="startScanner()">📷 Scan Food Barcode</button>
+
+<div class="field" style="margin-top:14px">
+<label>OR ENTER BARCODE NUMBER</label>
+<input type="text" id="barcodeInput" placeholder="e.g. 5000159484695">
+</div>
+
+<button class="action secondary" onclick="lookupBarcode()">Look Up Barcode</button>
+
+<p class="note" id="lookupMessage"></p>
+</section>
+
+<section class="card">
+<h2>Add Food Manually</h2>
+<p class="sub">Enter the nutrition for the portion you actually ate.</p>
+
+<div class="field" style="margin-top:12px">
+<label>FOOD NAME</label>
+<input type="text" id="foodName" placeholder="e.g. Chicken breast">
+</div>
+
+<div class="field" style="margin-top:10px">
+<label>MEAL</label>
+<select id="foodMeal">
+<option value="Breakfast">Breakfast</option>
+<option value="Lunch">Lunch</option>
+<option value="Dinner">Dinner</option>
+</select>
+</div>
+
+<div class="food-grid">
+<div class="field">
+<label>PROTEIN (G)</label>
+<input type="number" id="foodProtein" min="0" step="0.1" placeholder="0">
+</div>
+<div class="field">
+<label>CALORIES</label>
+<input type="number" id="foodCalories" min="0" step="1" placeholder="0">
+</div>
+<div class="field">
+<label>CARBS (G)</label>
+<input type="number" id="foodCarbs" min="0" step="0.1" placeholder="0">
+</div>
+<div class="field">
+<label>FAT (G)</label>
+<input type="number" id="foodFat" min="0" step="0.1" placeholder="0">
+</div>
+</div>
+
+<button class="action" onclick="addFood()">+ Add Food</button>
+</section>
+
+<section class="card">
+<h2>Your Meals</h2>
+<div id="meals"></div>
+</section>
+
+</section>
+
 </main>
 
 <footer>WORKOUTS · YOUR PERSONAL TRAINING APP</footer>
 
 <script>
+
+/* WORKOUT DATA */
 
 const plans=[
 
@@ -203,16 +357,15 @@ const plans=[
 ["Side plank","20–30 seconds each side",2,45]
 ]},
 
-{name:"Walk",title:"30-Minute Radio Walk",desc:"Get moving and enjoy your walk",items:[
+{name:"Walk",title:"Walking Day",desc:"Get moving and enjoy your walk",items:[
 ["Warm-up walk","5 minutes – easy pace",1,0],
-["Brisk radio walk","20 minutes – purposeful pace",1,0],
+["Brisk walk","20 minutes – purposeful pace",1,0],
 ["Cool-down walk","5 minutes – easy pace",1,0]
 ]}
 
 ];
 
 let selected=0;
-
 let checks=JSON.parse(localStorage.getItem("workoutsChecks")||"{}");
 let settings=JSON.parse(localStorage.getItem("workoutsSettings")||"{}");
 
@@ -220,18 +373,27 @@ let remaining=90;
 let interval=null;
 let running=false;
 
+/* NAVIGATION */
+
+function showPage(page){
+document.getElementById("workoutPage").classList.toggle("hidden",page!=="workouts");
+document.getElementById("foodPage").classList.toggle("hidden",page!=="food");
+document.getElementById("workoutTab").classList.toggle("active",page==="workouts");
+document.getElementById("foodTab").classList.toggle("active",page==="food");
+if(page==="food")renderFood();
+}
+
+/* WORKOUT FUNCTIONS */
+
 function saveChecks(){
 localStorage.setItem("workoutsChecks",JSON.stringify(checks));
 }
-
 function saveSettings(){
 localStorage.setItem("workoutsSettings",JSON.stringify(settings));
 }
-
 function settingKey(i){
 return plans[selected].name+"-"+i;
 }
-
 function escapeHTML(value){
 return String(value).replace(/[&<>"']/g,function(c){
 return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
@@ -239,96 +401,56 @@ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
 }
 
 function getSetting(i){
-
 let p=plans[selected].items[i];
 let s=settings[settingKey(i)]||{};
-
 let sets;
-
 if(Array.isArray(s.setData)){
 sets=s.setData;
 }else{
 let oldCount=Math.max(1,Math.min(20,Number(s.sets??p[2])||p[2]));
-sets=Array.from({length:oldCount},()=>({
-reps:p[1],
-weight:s.weight??""
-}));
+sets=Array.from({length:oldCount},()=>({reps:p[1],weight:s.weight??""}));
 }
-
-return {
-setData:sets,
-rest:s.rest??p[3]
-};
-
+return {setData:sets,rest:s.rest??p[3]};
 }
 
 function updateSet(i,setIndex,field,value){
-
 let key=settingKey(i);
 let setting=getSetting(i);
-
 setting.setData[setIndex][field]=value;
-
 settings[key]=setting;
 saveSettings();
-
 }
 
 function updateRest(i,value){
-
 let key=settingKey(i);
 let setting=getSetting(i);
-
 setting.rest=Math.max(0,Number(value)||0);
-
 settings[key]=setting;
 saveSettings();
-
 }
 
 function addSet(i){
-
 let key=settingKey(i);
 let setting=getSetting(i);
-
-if(setting.setData.length>=20){
-alert("Maximum 20 sets per exercise.");
-return;
-}
-
+if(setting.setData.length>=20){alert("Maximum 20 sets per exercise.");return;}
 let last=setting.setData[setting.setData.length-1];
-
-setting.setData.push({
-reps:last?.reps||plans[selected].items[i][1],
-weight:last?.weight||""
-});
-
+setting.setData.push({reps:last?.reps||plans[selected].items[i][1],weight:last?.weight||""});
 settings[key]=setting;
 saveSettings();
 render();
-
 }
 
 function removeSet(i){
-
 let key=settingKey(i);
 let setting=getSetting(i);
-
-if(setting.setData.length<=1){
-alert("You need at least one set.");
-return;
-}
-
+if(setting.setData.length<=1){alert("You need at least one set.");return;}
 setting.setData.pop();
-
 settings[key]=setting;
 saveSettings();
 render();
-
 }
 
 function render(){
-
 document.getElementById("days").innerHTML=plans.map((p,i)=>
 `<button class="${i===selected?'active':''}" onclick="selectDay(${i})">${p.name}</button>`
 ).join("");
@@ -340,245 +462,334 @@ document.getElementById("heading").textContent=p.title;
 document.getElementById("description").textContent=p.desc;
 
 document.getElementById("exercises").innerHTML=p.items.map((it,i)=>{
-
 let s=getSetting(i);
-
 let videoURL="https://www.youtube.com/results?search_query="+encodeURIComponent(it[0]+" exercise demonstration");
-
 let setsHTML=s.setData.map((set,j)=>`
-
 <div class="set-row">
-
 <div class="set-title">SET ${j+1}</div>
-
 <div class="controls">
-
 <div class="field">
 <label>REPS / TIME</label>
-<input type="text"
-value="${escapeHTML(set.reps)}"
-onchange="updateSet(${i},${j},'reps',this.value)"
-placeholder="e.g. 10 reps">
+<input type="text" value="${escapeHTML(set.reps)}"
+onchange="updateSet(${i},${j},'reps',this.value)" placeholder="e.g. 10 reps">
 </div>
-
 ${p.name!=="Walk"?`
 <div class="field">
 <label>WEIGHT (KG)</label>
-<input type="number" min="0" step="0.5"
-value="${escapeHTML(set.weight)}"
-onchange="updateSet(${i},${j},'weight',this.value)"
-placeholder="e.g. 12">
+<input type="number" min="0" step="0.5" value="${escapeHTML(set.weight)}"
+onchange="updateSet(${i},${j},'weight',this.value)" placeholder="e.g. 12">
+</div>`:''}
 </div>
-`:''}
-
-</div>
-</div>
-
-`).join("");
+</div>`).join("");
 
 return `
-
 <div class="exercise ${done.includes(i)?'done':''}">
-
 <div class="exercise-top">
-
-<input type="checkbox"
-${done.includes(i)?'checked':''}
-onchange="toggle(${i},this.checked)">
-
-<div>
-<strong>${escapeHTML(it[0])}</strong>
-<span>${escapeHTML(it[1])}</span>
+<input type="checkbox" ${done.includes(i)?'checked':''} onchange="toggle(${i},this.checked)">
+<div><strong>${escapeHTML(it[0])}</strong><span>${escapeHTML(it[1])}</span></div>
 </div>
-
-</div>
-
-<a class="video-btn"
-href="${videoURL}"
-target="_blank"
-rel="noopener noreferrer">
-▶ Watch exercise video
-</a>
-
-<div class="set-heading">
-<strong>Your sets (${s.setData.length})</strong>
-</div>
-
+<a class="video-btn" href="${videoURL}" target="_blank" rel="noopener noreferrer">▶ Watch exercise video</a>
+<div class="set-heading"><strong>Your sets (${s.setData.length})</strong></div>
 ${setsHTML}
-
 <div class="set-actions">
-<button class="small-btn add-set" onclick="addSet(${i})">
-+ Add Set
-</button>
-
-<button class="small-btn remove-set" onclick="removeSet(${i})">
-− Remove Set
-</button>
+<button class="small-btn add-set" onclick="addSet(${i})">+ Add Set</button>
+<button class="small-btn remove-set" onclick="removeSet(${i})">− Remove Set</button>
 </div>
-
 ${p.name!=="Walk"?`
-
 <div class="field" style="margin-top:12px">
 <label>REST TIME (SECONDS)</label>
-<input type="number" min="0" max="600"
-value="${s.rest}"
-onchange="updateRest(${i},this.value)">
+<input type="number" min="0" max="600" value="${s.rest}" onchange="updateRest(${i},this.value)">
 </div>
-
-<button class="timer-btn" style="margin-top:8px"
-onclick="startTimer(${i})">
-Start ${s.rest}-second rest timer
-</button>
-
+<button class="timer-btn" style="margin-top:8px" onclick="startTimer(${i})">Start ${s.rest}-second rest timer</button>
 `:''}
-
-</div>
-
-`;
-
+</div>`;
 }).join("");
 
 let n=done.length;
 let total=p.items.length;
-
-document.getElementById("count").textContent=
-`${n} of ${total} exercises completed`;
-
-document.getElementById("bar").style.width=
-(n/total*100)+"%";
-
+document.getElementById("count").textContent=`${n} of ${total} exercises completed`;
+document.getElementById("bar").style.width=(n/total*100)+"%";
 }
 
-function selectDay(i){
-selected=i;
-render();
-}
+function selectDay(i){selected=i;render();}
 
 function toggle(i,on){
-
 let a=checks[plans[selected].name]||[];
-
-checks[plans[selected].name]=on
-?[...new Set([...a,i])]
-:a.filter(x=>x!==i);
-
+checks[plans[selected].name]=on?[...new Set([...a,i])]:a.filter(x=>x!==i);
 saveChecks();
 render();
-
 }
 
 function resetWorkout(){
-
 checks[plans[selected].name]=[];
-
 saveChecks();
 render();
-
 }
 
 function finishWorkout(){
-
 let n=(checks[plans[selected].name]||[]).length;
-
-alert(n===plans[selected].items.length
-?"Brilliant work! Workout completed! 💪"
-:`You've completed ${n} of ${plans[selected].items.length} exercises.`);
-
+alert(n===plans[selected].items.length?"Brilliant work! Workout completed! 💪":`You've completed ${n} of ${plans[selected].items.length} exercises.`);
 }
 
 function showTimer(){
-
 let m=Math.floor(remaining/60);
 let s=remaining%60;
-
-document.getElementById("clock").textContent=
-String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
-
-document.getElementById("pauseBtn").textContent=
-running?"Pause":"Resume";
-
+document.getElementById("clock").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+document.getElementById("pauseBtn").textContent=running?"Pause":"Resume";
 }
 
 function timerComplete(){
-
 clearInterval(interval);
 interval=null;
 running=false;
-
-document.getElementById("timerLabel").textContent=
-"REST COMPLETE · GO AGAIN!";
-
+document.getElementById("timerLabel").textContent="REST COMPLETE · GO AGAIN!";
 showTimer();
-
 if(navigator.vibrate)navigator.vibrate([250,150,250]);
-
 }
 
 function startTimer(i){
-
 let s=getSetting(i);
-
 clearInterval(interval);
-
 remaining=Math.max(0,Number(s.rest)||0);
-
-document.getElementById("timerLabel").textContent=
-"REST TIMER · "+plans[selected].items[i][0];
-
+document.getElementById("timerLabel").textContent="REST TIMER · "+plans[selected].items[i][0];
 running=true;
 showTimer();
-
-if(remaining===0){
-running=false;
-showTimer();
-return;
-}
-
-interval=setInterval(()=>{
-remaining--;
-showTimer();
-if(remaining<=0)timerComplete();
-},1000);
-
+if(remaining===0){running=false;showTimer();return;}
+interval=setInterval(()=>{remaining--;showTimer();if(remaining<=0)timerComplete();},1000);
 }
 
 function pauseTimer(){
-
 if(running){
-clearInterval(interval);
-interval=null;
-running=false;
+clearInterval(interval);interval=null;running=false;
 }else if(remaining>0){
-
 running=true;
-
-interval=setInterval(()=>{
-remaining--;
-showTimer();
-if(remaining<=0)timerComplete();
-},1000);
-
+interval=setInterval(()=>{remaining--;showTimer();if(remaining<=0)timerComplete();},1000);
 }
-
 showTimer();
-
 }
 
 function resetTimer(){
-
 clearInterval(interval);
 interval=null;
 running=false;
 remaining=90;
-
 document.getElementById("timerLabel").textContent="REST TIMER";
-
 showTimer();
-
 }
+
+/* FOOD TRACKER */
+
+const foodDBKey="workoutsFoodDiary";
+const targetKey="workoutsProteinTarget";
+let foodData=JSON.parse(localStorage.getItem(foodDBKey)||"{}");
+let proteinTarget=Number(localStorage.getItem(targetKey))||180;
+let scannerInstance=null;
+
+function todayString(){
+let d=new Date();
+return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+
+document.getElementById("foodDate").value=todayString();
+document.getElementById("proteinTarget").value=proteinTarget;
+
+function saveFoodData(){
+localStorage.setItem(foodDBKey,JSON.stringify(foodData));
+}
+
+function saveTarget(){
+proteinTarget=Math.max(1,Number(document.getElementById("proteinTarget").value)||180);
+localStorage.setItem(targetKey,proteinTarget);
+renderFood();
+}
+
+function currentDay(){
+return document.getElementById("foodDate").value||todayString();
+}
+
+function dayFoods(){
+if(!foodData[currentDay()])foodData[currentDay()]={
+Breakfast:[],Lunch:[],Dinner:[]
+};
+return foodData[currentDay()];
+}
+
+function addFood(){
+let name=document.getElementById("foodName").value.trim();
+if(!name){alert("Enter a food name.");return;}
+
+let meal=document.getElementById("foodMeal").value;
+let food={
+id:Date.now()+Math.random(),
+name:name,
+protein:Number(document.getElementById("foodProtein").value)||0,
+calories:Number(document.getElementById("foodCalories").value)||0,
+carbs:Number(document.getElementById("foodCarbs").value)||0,
+fat:Number(document.getElementById("foodFat").value)||0
+};
+
+dayFoods()[meal].push(food);
+saveFoodData();
+
+["foodName","foodProtein","foodCalories","foodCarbs","foodFat"].forEach(id=>{
+document.getElementById(id).value="";
+});
+
+renderFood();
+}
+
+function removeFood(meal,id){
+dayFoods()[meal]=dayFoods()[meal].filter(f=>f.id!==id);
+saveFoodData();
+renderFood();
+}
+
+function renderFood(){
+let day=dayFoods();
+let meals=["Breakfast","Lunch","Dinner"];
+let total={protein:0,calories:0,carbs:0,fat:0};
+
+meals.forEach(meal=>{
+day[meal].forEach(f=>{
+total.protein+=Number(f.protein)||0;
+total.calories+=Number(f.calories)||0;
+total.carbs+=Number(f.carbs)||0;
+total.fat+=Number(f.fat)||0;
+});
+});
+
+document.getElementById("totalProtein").textContent=total.protein.toFixed(1)+"g";
+document.getElementById("totalCalories").textContent=Math.round(total.calories);
+document.getElementById("totalCarbs").textContent=total.carbs.toFixed(1)+"g";
+document.getElementById("totalFat").textContent=total.fat.toFixed(1)+"g";
+
+let pct=Math.min(100,total.protein/proteinTarget*100);
+document.getElementById("proteinBar").style.width=pct+"%";
+
+document.getElementById("proteinMessage").textContent=
+total.protein>=proteinTarget
+?"Protein target reached! Great work 💪"
+:`${Math.max(0,proteinTarget-total.protein).toFixed(1)}g protein left to reach your target.`;
+
+document.getElementById("meals").innerHTML=meals.map(meal=>{
+let list=day[meal];
+let sum=list.reduce((a,f)=>a+(Number(f.protein)||0),0);
+
+return `
+<div class="meal">
+<h3>${meal}<span class="meal-total">${sum.toFixed(1)}g protein</span></h3>
+${list.length?list.map(f=>`
+<div class="food-entry">
+<button onclick="removeFood('${meal}',${f.id})">✕</button>
+<strong>${escapeHTML(f.name)}</strong>
+<small>
+${Number(f.protein)||0}g protein · ${Number(f.calories)||0} kcal
+<br>
+${Number(f.carbs)||0}g carbs · ${Number(f.fat)||0}g fat
+</small>
+</div>`).join(""):`<p class="note">No food added yet.</p>`}
+</div>`;
+}).join("");
+}
+
+/* BARCODE LOOKUP */
+
+async function lookupBarcode(){
+let barcode=document.getElementById("barcodeInput").value.trim();
+if(!barcode){alert("Enter a barcode first.");return;}
+
+let message=document.getElementById("lookupMessage");
+message.textContent="Looking up food...";
+
+try{
+let response=await fetch("https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(barcode)+".json");
+let result=await response.json();
+
+if(result.status!==1||!result.product){
+message.textContent="Food not found. Try entering it manually.";
+return;
+}
+
+let p=result.product;
+let n=p.nutriments||{};
+
+document.getElementById("foodName").value=p.product_name||"Unknown food";
+document.getElementById("foodProtein").value=Number(n.proteins_100g)||0;
+document.getElementById("foodCalories").value=Math.round(Number(n["energy-kcal_100g"])||0);
+document.getElementById("foodCarbs").value=Number(n.carbohydrates_100g)||0;
+document.getElementById("foodFat").value=Number(n.fat_100g)||0;
+
+message.textContent="Found "+(p.product_name||"food")+". Values are per 100g. Adjust them for your portion before adding.";
+
+}catch(e){
+message.textContent="Could not connect to the food database. Try again or enter manually.";
+}
+}
+
+/* CAMERA SCANNER */
+
+function loadScannerLibrary(){
+return new Promise((resolve,reject)=>{
+if(window.Html5Qrcode){resolve();return;}
+
+let script=document.createElement("script");
+script.src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js";
+script.onload=resolve;
+script.onerror=reject;
+document.head.appendChild(script);
+});
+}
+
+async function startScanner(){
+try{
+await loadScannerLibrary();
+
+document.getElementById("scanner").classList.remove("hidden");
+document.getElementById("scanButton").classList.add("hidden");
+
+scannerInstance=new Html5Qrcode("scannerReader");
+
+await scannerInstance.start(
+{facingMode:"environment"},
+{fps:10,qrbox:{width:250,height:180},
+formatsToSupport:[
+Html5QrcodeSupportedFormats.EAN_13,
+Html5QrcodeSupportedFormats.EAN_8,
+Html5QrcodeSupportedFormats.UPC_A,
+Html5QrcodeSupportedFormats.UPC_E
+]},
+async decodedText=>{
+document.getElementById("barcodeInput").value=decodedText;
+await stopScanner();
+lookupBarcode();
+},
+()=>{}
+);
+
+}catch(e){
+document.getElementById("lookupMessage").textContent=
+"Camera unavailable. Check camera permission and make sure the app is opened over HTTPS.";
+await stopScanner();
+}
+}
+
+async function stopScanner(){
+if(scannerInstance){
+try{
+if(scannerInstance.isScanning)await scannerInstance.stop();
+scannerInstance.clear();
+}catch(e){}
+scannerInstance=null;
+}
+document.getElementById("scanner").classList.add("hidden");
+document.getElementById("scanButton").classList.remove("hidden");
+}
+
+/* START APP */
 
 render();
 showTimer();
+renderFood();
 
 </script>
 </body>
